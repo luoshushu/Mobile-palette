@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="//at.alicdn.com/t/font_579152_ibbdm3t9ynt2csor.js"></script>
+  <title>手机画板</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    body{
+      overflow: hidden;
+    }
+    #app {
+      background: rgba(0,0,0,0.1);
+      display: block;
+    }
+    .actions {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px;
+      background: #ccc;
+    }
+    .icon {
+       width: 1.5em;
+       height: 1.5em;
+       vertical-align: -0.15em;
+       fill: #000;
+       overflow: hidden;
+    }
+    button{
+      border: none;
+      margin: 0 1em;
+    }
+   label{
+    margin: 0 .5em;     
+    }
+  </style>
+</head>
+
+<body>
+  <div class="actions">
+    <label>
+      <input type="radio" name="penType" value="pen" checked>
+      <svg class="icon" aria-hidden="true">
+        <use xlink:href="#icon-fon11"></use>
+      </svg>
+  </label>
+    <label>
+      <input type="radio" name="penType" value="eraser">
+       <svg class="icon" aria-hidden="true">
+          <use xlink:href="#icon-fon2"></use>
+        </svg>
+    </label>
+     <button id="save">
+        <svg class="icon" aria-hidden="true">
+            <use xlink:href="#icon-fon33"></use>
+        </svg>
+    </button>
+    <button id="empty">
+        <svg class="icon" aria-hidden="true">
+            <use xlink:href="#icon-fon44"></use>
+        </svg>
+    </button> 
+
+    <button id="suiji">画笔随机色</button>
+   
+  </div>
+  <canvas id="app"></canvas>
+  <script>
+    let canvas = document.querySelector('#app')
+    //设置canvas宽高
+    let clientWidth = document.documentElement.clientWidth
+    let clientHeight = document.documentElement.clientHeight
+    canvas.width = clientWidth
+    canvas.height = clientHeight
+    //获取2d的画笔
+    let context = canvas.getContext('2d')
+    let previosPoint
+ 
+    let  colorBi 
+    canvas.addEventListener('touchmove', function (e) {
+      e.preventDefault()
+      let penType = document.querySelector('input[name="penType"]:checked').value
+      let {pageX, pageY} = e.touches[0]
+      if (penType === 'pen') {
+        // context.fillRect(pageX-2, pageY-2, 4, 4) //还是有间距
+        if (previosPoint) { //如果有上一个点
+          context.strokeStyle = colorBi
+          context.beginPath();
+          context.moveTo(previosPoint.pageX, previosPoint.pageY); //画笔移动到上一个点
+          context.lineTo(pageX, pageY) //画线到这一个点
+          context.stroke()
+        }
+        //上一个点是下一个点的开始点，ES6语法
+        previosPoint = {pageX, pageY }
+          //"pageX":pageX,
+          //"pageY":pageY
+      }else if(penType === 'eraser'){ //橡皮擦
+        context.clearRect(pageX - 10,pageY - 10,20,20)
+      }
+
+      //重置可以画另一条
+      canvas.addEventListener('touchend', function (e) {
+        previosPoint = null
+      })
+    })
+    save.onclick = function () {
+      var canvas = document.getElementById("app")
+      var data = canvas.toDataURL("image/png")
+      var newWindow = window.open('about:blank','image from canvas')
+      newWindow.document.write("<img src='"+data+"' alt='from canvas'/>")
+    }
+    empty.onclick = function () {
+      context.clearRect(0,0,canvas.width,canvas.height)
+    }
+
+    suiji.addEventListener('click',function () {
+      colorBi = '#'+(Math.random()*0xffffff<<0).toString(16);
+    })
+ 
+    /*
+  let app = document.querySelector('#app')
+  app.addEventListener('touchstart',function (e) {
+    console.log('触发touchstart，开始摸了')
+    // console.log(e.touches[0].clientX)
+    // console.log(e.touches[0].clientY)
+ 
+    let {pageX,pageY} = e.touches[0]
+    //析构赋值
+    //等价于下面声明的clientX，clientY
+    // let clientX = e.touches[0].clientX
+    // let clientY = e.touches[0].clientX
+    let div = document.createElement('div')
+    div.style.position = 'absolute'
+    div.style.top = pageY + 'px'
+    div.style.left = pageX + 'px'
+    div.style.width = '4px'
+    div.style.height = '4px'
+    div.style.borderRadius = '2px'
+    div.style.background = 'red'
+    document.body.appendChild(div) 
+  })
+  app.addEventListener('touchmove',function (e) {
+    console.log('触发touchmove，开始动了')
+    
+    let {pageX,pageY} = e.touches[0]
+    //析构赋值
+    //等价于下面声明的clientX，clientY
+    // let clientX = e.touches[0].clientX
+    // let clientY = e.touches[0].clientX
+    let div = document.createElement('div')
+    div.style.position = 'absolute'
+    div.style.top = pageY + 'px'
+    div.style.left = pageX + 'px'
+    div.style.width = '4px'
+    div.style.height = '4px'
+    div.style.borderRadius = '2px'
+    div.style.background = 'red'
+    document.body.appendChild(div)
+    
+  })
+  app.addEventListener('touchend',function () {
+    console.log('触发touchend，没摸了')
+  })
+  */
+  </script>
+
+</body>
+
+</html>
